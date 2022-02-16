@@ -1,0 +1,12 @@
+com/example/TestPlugin/ShopCommand.java
+ com.example.TestPlugin.ShopCommand
+com/example/TestPlugin/ShopInventory.java
+ com.example.TestPlugin.ShopInventory
+com/example/TestPlugin/ItemInfo.java
+ com.example.TestPlugin.ItemInfo
+com/example/TestPlugin/OpenShopInventoryEvent.java
+ com.example.TestPlugin.OpenShopInventoryEvent
+com/example/TestPlugin/ShopInfo.java
+ com.example.TestPlugin.ShopInfo
+com/example/TestPlugin/TestPlugin.java
+ com.example.TestPlugin.TestPlugin

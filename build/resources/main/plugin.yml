@@ -1,0 +1,8 @@
+name: TestPlugin
+version: 1.0
+main: com.example.TestPlugin.TestPlugin
+
+commands:
+  shop:
+    description: 상점 창을 엽니다.
+    usage: /shop
