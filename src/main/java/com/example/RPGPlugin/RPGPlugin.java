@@ -4,23 +4,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class RPGPlugin extends JavaPlugin {
 
     @Override
-    @SuppressWarnings({"unchecked"})
     public void onEnable() {    //플러그인 활성화시 실행
         SerializeManager.loadFile();
         if (SerializeManager.yml.contains("Plugin.playerClass")) {
-            PlayerClassManager.setPlayerClassMap((Map<UUID, PlayerClass>) SerializeManager.yml.get("Plugin.playerClass"));
+            List<Map<?, ?>> mapList = SerializeManager.yml.getMapList("Plugin.playerClass");
+            PlayerClassManager.setPlayerClassMap((Map<String, String>) mapList.get(0));
         }
 
         Objects.requireNonNull(getCommand("shop")).setExecutor(new ShopCommand());
         Objects.requireNonNull(getCommand("reinforce")).setExecutor(new ReinforceCommand());
-        Objects.requireNonNull(getCommand("cl")).setExecutor(new PlayerClassCommand());
+        Objects.requireNonNull(getCommand("class")).setExecutor(new PlayerClassCommand());
+        Objects.requireNonNull(getCommand("class")).setTabCompleter(new PlayerClassCommand());
         getServer().getPluginManager().registerEvents(new ReinforceInvManager(), this);
         getServer().getPluginManager().registerEvents(new ShopInvManager(), this);
 
@@ -36,7 +35,17 @@ public class RPGPlugin extends JavaPlugin {
     }
 
     public void Save() {
-        SerializeManager.yml.set("Plugin.playerClass", PlayerClassManager.getPlayerClassMap());
+        List<Map<String, String>> mapList = Arrays.asList(DefaultMapToStringMap(PlayerClassManager.getPlayerClassMap()));
+        SerializeManager.yml.set("Plugin.playerClass", mapList);
         SerializeManager.saveFile();
+        Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + ChatColor.BLUE.toString() + "저장 완료 !");
+    }
+
+    public Map<String, String> DefaultMapToStringMap(Map<UUID, PlayerClass> map) {
+        Map<String, String> newMap = new HashMap<>();
+        for (Map.Entry<UUID, PlayerClass> entry : map.entrySet()) {
+            newMap.put(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return newMap;
     }
 }

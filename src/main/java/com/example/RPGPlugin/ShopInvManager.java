@@ -26,6 +26,11 @@ public class ShopInvManager implements Listener {
 
     @EventHandler
     public void onOpenShopInventory(OpenShopInventoryEvent e) {
+        assert shopInfo.shopInfoArrayList != null;
+        if(e.shopNo >= shopInfo.shopInfoArrayList.size()) {
+            e.player.sendMessage("존재하지 않는 상점 번호입니다!");
+            return;
+        }
         tradeInfoArrayList = shopInfo.shopInfoArrayList.get(e.shopNo);
         inv.clear();
 

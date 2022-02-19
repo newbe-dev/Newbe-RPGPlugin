@@ -2,14 +2,24 @@ name: RPGPlugin
 version: 1.0
 main: com.example.RPGPlugin.RPGPlugin
 api-version: 1.18
+author: NewbieDev
 
 commands:
   shop:
     description: 상점 창을 엽니다.
     usage: /shop [상점번호]
+    aliases:
+      - 상점
   reinforce:
     description: 강화 창을 엽니다.
     usage: /reinforce
-  cl:
+    aliases:
+      - re
+      - rein
+      - 강화
+  class:
     description: 플레이어 직업 관련 명령어를 실행합니다.
-    usage: /cl
+    usage: /class
+    aliases:
+      - cl
+      - 직업

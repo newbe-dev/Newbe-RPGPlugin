@@ -87,7 +87,7 @@ public class ShopInfo {
             }
         }
         SerializeManager.saveFile();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "직렬화 성공!");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "상점 목록을 성공적으로 직렬화했습니다!");
     }
 
     private void conductDeserializing() {
@@ -101,6 +101,6 @@ public class ShopInfo {
             }
             shopInfoArrayList.add(temp);
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "역직렬화 성공!");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "상점 목록을 성공적으로 역직렬화했습니다!");
     }
 }
