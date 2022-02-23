@@ -1,5 +1,6 @@
 package com.example.RPGPlugin;
 
+import com.example.RPGPlugin.Reinforce.OpenReinforceInventoryEvent;
 import org.bukkit.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

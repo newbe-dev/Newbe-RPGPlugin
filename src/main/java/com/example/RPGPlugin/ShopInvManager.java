@@ -1,7 +1,10 @@
 package com.example.RPGPlugin;
 
+import com.example.RPGPlugin.Shop.OpenShopInventoryEvent;
+import com.example.RPGPlugin.Shop.ShopInfo;
+import com.example.RPGPlugin.Shop.tradeInfo;
 import org.bukkit.*;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,36 +19,76 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class ShopInvManager implements Listener {
-    private final Inventory inv;
-    private ArrayList<tradeInfo> tradeInfoArrayList;
-    private final ShopInfo shopInfo = new ShopInfo();
+    private static ArrayList<tradeInfo> tradeInfoArrayList;
+
+    private final ItemStack GRAY_PANEL;
+    private final ItemStack NONE;
 
     public ShopInvManager() {
-        inv = Bukkit.createInventory(null, 54, "상점");
+        Bukkit.createInventory(null, 54, "상점");
+        GRAY_PANEL = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        ItemMeta itemMeta = GRAY_PANEL.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.GRAY + ChatColor.ITALIC.toString() + " ");
+        itemMeta.removeItemFlags();
+        GRAY_PANEL.setItemMeta(itemMeta);
+        NONE = new ItemStack(Material.AIR);
     }
 
     @EventHandler
     public void onOpenShopInventory(OpenShopInventoryEvent e) {
-        assert shopInfo.shopInfoArrayList != null;
-        if(e.shopNo >= shopInfo.shopInfoArrayList.size()) {
+        if (!SerializeManager.yml.contains("Plugin.shop0")) {
+            ShopInfo.InitShopInfo();
+            ShopInfo.conductSerializing();
+        } else {
+            ShopInfo.conductDeserializing();
+        }
+
+        if (e.shopNo >= ShopInfo.shopInfoArrayList.size()) {
             e.player.sendMessage("존재하지 않는 상점 번호입니다!");
             return;
         }
-        tradeInfoArrayList = shopInfo.shopInfoArrayList.get(e.shopNo);
-        inv.clear();
 
-        for (int i = 0; i < tradeInfoArrayList.size(); i++) {
-            inv.setItem(19 + 2 * i, tradeInfoArrayList.get(i).priceItemStack);
+        e.player.openInventory(createShopInventory(e.shopNo));
+    }
+
+    private Inventory createShopInventory(int shopNo) {
+        tradeInfoArrayList = ShopInfo.shopInfoArrayList.get(shopNo);
+        Inventory inventory;
+        switch (shopNo) {
+            case 0: {
+                inventory = Bukkit.createInventory(null, 54, String.format("%s%s[ 무기 ]", ChatColor.BOLD, ChatColor.YELLOW));
+                break;
+            }
+            case 1: {
+                inventory = Bukkit.createInventory(null, 54, String.format("%s%s[ 방어구 ]", ChatColor.BOLD, ChatColor.DARK_BLUE));
+                break;
+            }
+            default: {
+                inventory = Bukkit.createInventory(null, 54, "");
+                break;
+            }
         }
-        e.player.openInventory(inv);
+
+        for (int i = 0; i < inventory.getSize(); i++) {
+            inventory.setItem(i, GRAY_PANEL);
+        }
+        for (int i = 1; i < 5; i++) {
+            for (int j = 0; j < 7; j++) {
+                inventory.setItem((i * 9) + j + 1, NONE);
+            }
+        }
+        for (int i = 0; i < tradeInfoArrayList.size(); i++) {
+            inventory.setItem(10 + i*2, tradeInfoArrayList.get(i).buyItemStack);
+        }
+        return inventory;
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {   //인벤토리 클릭 시
-        if (e.getInventory() != inv) return;    //이 인벤토리를 클릭한게 아니라면 취소
+        if (!e.getInventory().contains(GRAY_PANEL) || e.getInventory().getHolder() != null)
+            return;    //이 인벤토리를 클릭한게 아니라면 취소
         e.setCancelled(true);   //위치 변경 취소
         ItemStack clickedItem = e.getCurrentItem(); //클릭된 아이템
-        //만약 클릭된 아이템이 없다면 취소
         if (clickedItem == null || clickedItem.getType().equals(Material.AIR)) return;
 
         int itemIndex;
@@ -76,20 +119,19 @@ public class ShopInvManager implements Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent e) { //인벤토리 드래그 시
-        if (e.getInventory() == inv) {  //만약 드래그된 인벤토리가 이 인벤토리라면
+        if (!e.getInventory().contains(GRAY_PANEL) || e.getInventory().getHolder() != null) {  //만약 드래그된 인벤토리가 이 인벤토리라면
             e.setCancelled(true);   //위치 변경 취소
         }
     }
 
     @EventHandler
     public void onEntityInteract(PlayerInteractEntityEvent e) {
-        if (e.getRightClicked().getType().equals(EntityType.VILLAGER)) {
-            Player player = e.getPlayer();
-            for (String tag : e.getRightClicked().getScoreboardTags()) {
-                if (tag.startsWith("CustomShopNum")) {
-                    player.performCommand("RPGPlugin:shop " + tag.split(":")[1]);
-                }
-            }
-        }
+        Entity entity = e.getRightClicked();
+        Player player = e.getPlayer();
+        if (SerializeManager.yml.getInt(String.format("Plugin.Shop.Villager.%s", entity.getEntityId()), -1) == -1)
+            return;
+
+        OpenShopInventoryEvent event = new OpenShopInventoryEvent(player, SerializeManager.yml.getInt(String.format("Plugin.Shop.Villager.%s", entity.getEntityId())));
+        Bukkit.getPluginManager().callEvent(event);
     }
 }

@@ -10,6 +10,7 @@ commands:
     usage: /shop [상점번호]
     aliases:
       - 상점
+    permission: op
   reinforce:
     description: 강화 창을 엽니다.
     usage: /reinforce
@@ -17,9 +18,18 @@ commands:
       - re
       - rein
       - 강화
+    permission: op
   class:
     description: 플레이어 직업 관련 명령어를 실행합니다.
     usage: /class
     aliases:
       - cl
       - 직업
+    permission: op
+  quest:
+    description: 퀘스트 관련 명령어를 실행합니다.
+    usage: /quest
+    aliases:
+      - q
+      - 퀘스트
+    permission: op

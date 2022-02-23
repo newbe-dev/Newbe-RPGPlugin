@@ -1,4 +1,4 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.PlayerClass;
 
 public enum PlayerClass {
     NONE, // 백수

@@ -1,5 +1,6 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.Shop;
 
+import com.example.RPGPlugin.SerializeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -7,23 +8,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ShopInfo {
-    public ArrayList<ArrayList<tradeInfo>> shopInfoArrayList = new ArrayList<>();
+    public static ArrayList<ArrayList<tradeInfo>> shopInfoArrayList = new ArrayList<>();
 
-    public ShopInfo() {
-        if(!SerializeManager.yml.contains("Plugin.shop0")){
-            InitShopInfo();
-            conductSerializing();
-        }
-        else {
-            conductDeserializing();
-        }
-    }
-
-    private void InitShopInfo() {
+    public static void InitShopInfo() {
         ArrayList<tradeInfo> tradeInfoArrayList = new ArrayList<>();
         List<String> lore = new ArrayList<>();
 
@@ -79,7 +69,7 @@ public class ShopInfo {
         shopInfoArrayList.add((ArrayList<tradeInfo>) tradeInfoArrayList.clone());
     }
 
-    private void conductSerializing() {
+    public static void conductSerializing() {
         for (int i = 0; i < shopInfoArrayList.size(); i++) {
             for (int j = 0; j < shopInfoArrayList.get(i).size(); j++) {
                 SerializeManager.yml.set(String.format("Plugin.shop%d.trade%d.buy", i, j), shopInfoArrayList.get(i).get(j).buyItemStack);
@@ -90,9 +80,8 @@ public class ShopInfo {
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "상점 목록을 성공적으로 직렬화했습니다!");
     }
 
-    private void conductDeserializing() {
-        SerializeManager.loadFile();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Yml 파일을 불러오는 중입니다 ..");
+    public static void conductDeserializing() {
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "상점 목록을 불러오는 중입니다 ..");
         for (int i = 0; SerializeManager.yml.contains(String.format("Plugin.shop%d", i)); i++) {
             ArrayList<tradeInfo> temp = new ArrayList<>();
             for (int j = 0; SerializeManager.yml.contains(String.format("Plugin.shop%d.trade%d", i, j)); j++) {

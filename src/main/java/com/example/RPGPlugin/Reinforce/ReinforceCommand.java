@@ -1,13 +1,13 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.Reinforce;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
-public class ReinforceCommand implements CommandExecutor {
+import java.util.Arrays;
+import java.util.List;
+
+public class ReinforceCommand implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {  //명령어 실행 시
         if (sender instanceof Player) {
@@ -19,5 +19,16 @@ public class ReinforceCommand implements CommandExecutor {
             return false;
         }
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (!sender.isOp()) return null;
+        if (command.getName().equals("reinforce") || command.getName().equals("rein") || command.getName().equals("강화")) {
+            if (args.length == 1) {
+                return Arrays.asList("assign");
+            }
+        }
+        return null;
     }
 }

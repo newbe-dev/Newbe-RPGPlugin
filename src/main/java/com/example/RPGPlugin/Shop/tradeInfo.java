@@ -1,11 +1,7 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.Shop;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.Serializable;
-
-public class tradeInfo implements Serializable {
-
-    static final long serialVersionUID = 42L;
+public class tradeInfo {
     public final ItemStack buyItemStack;
     public final ItemStack priceItemStack;
 

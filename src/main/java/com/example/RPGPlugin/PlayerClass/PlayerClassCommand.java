@@ -1,4 +1,4 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.PlayerClass;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -64,6 +64,7 @@ public class PlayerClassCommand implements CommandExecutor, TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if(!sender.isOp()) return null;
         if(command.getName().equals("cl") || command.getName().equals("class")) {
             if(args.length == 1) {
                 return Arrays.asList("set", "remove");

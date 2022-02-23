@@ -1,20 +1,17 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.PlayerClass;
 
-import org.bukkit.Bukkit;
-
+import com.example.RPGPlugin.SerializeManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerClassManager {
     private static Map<UUID, PlayerClass> playerClassMap = new HashMap<>();
 
     public static void setPlayerClass(Player player, String newPlayerClass) {
         if (playerClassMap.containsKey(player.getUniqueId())) {
-            Bukkit.getLogger().info(String.format("%s has already had a class !", player.getDisplayName()));
+            player.sendMessage(String.format("%s%s(!) %s이미 직업이 있습니다 !", ChatColor.RED, ChatColor.BOLD, ChatColor.WHITE));
             return;
         }
 
@@ -80,5 +77,18 @@ public class PlayerClassManager {
             newMap.put(UUID.fromString(entry.getKey()), playerClass);
         }
         playerClassMap = newMap;
+    }
+
+    public static void save() {
+        List<Map<String, String>> mapList = Arrays.asList(convertStringMap(PlayerClassManager.getPlayerClassMap())); // 플레이어 직업
+        SerializeManager.yml.set("Plugin.playerClass", mapList);
+    }
+
+    public static Map<String, String> convertStringMap(Map<UUID, PlayerClass> map) {
+        Map<String, String> newMap = new HashMap<>();
+        for (Map.Entry<UUID, PlayerClass> entry : map.entrySet()) {
+            newMap.put(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return newMap;
     }
 }
