@@ -2,20 +2,18 @@ plugins {
     id 'java'
 }
 
-group 'org.jong_plugin'
-version '1.0-SNAPSHOT'
+group 'spigot.gradle.project'
+version '1.0.0'
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
-    }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    implementation "org.spigotmc:spigot-api:1.18.1-R0.1-SNAPSHOT"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
 }
 
 test {

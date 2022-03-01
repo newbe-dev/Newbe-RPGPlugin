@@ -9,29 +9,31 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ReinforceInvManager implements Listener {
     private final Inventory inv;
-    private final ItemStack reinforceAnvil = new ItemStack(Material.ANVIL);
-    private final ItemStack pinkPlane = new ItemStack(Material.PINK_STAINED_GLASS_PANE, 1);
-    private final ItemStack whitePlane = new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1);
+    private final ItemStack reinforceAnvil;
+    private final ItemStack pinkPlane;
+    private final ItemStack whitePlane;
+
+    private ItemStack createItem(Material material, String displayName, List<String> lore, Boolean hideFlags) {
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(displayName);
+        itemMeta.setLore(lore);
+        if(hideFlags) {
+            itemMeta.removeItemFlags();
+        }
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
 
     public ReinforceInvManager() {
         inv = Bukkit.createInventory(null, 54, "강화");
-        ItemMeta itemMeta = reinforceAnvil.getItemMeta();
-        itemMeta.setDisplayName(String.format("%s%s%s강화", ChatColor.BOLD, ChatColor.ITALIC, ChatColor.DARK_BLUE));
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(String.format("%s%s--------------", ChatColor.BOLD, ChatColor.WHITE));
-        lore.add(String.format("%s%s%s강화 성공 확률: -", ChatColor.BOLD, ChatColor.ITALIC, ChatColor.GRAY));
-        itemMeta.setLore(lore);
-        reinforceAnvil.setItemMeta(itemMeta);
-        itemMeta = pinkPlane.getItemMeta();
-        itemMeta.setDisplayName(" ");
-        pinkPlane.setItemMeta(itemMeta);
-        itemMeta = whitePlane.getItemMeta();
-        itemMeta.setDisplayName(" ");
-        whitePlane.setItemMeta(itemMeta);
+        reinforceAnvil = createItem(Material.ANVIL, String.format("%s%s강화", ChatColor.BOLD, ChatColor.YELLOW), null, true);
+        pinkPlane = createItem(Material.PINK_STAINED_GLASS_PANE, "", null, true);
+        whitePlane = createItem(Material.WHITE_STAINED_GLASS_PANE, "", null, true);
     }
 
     @EventHandler

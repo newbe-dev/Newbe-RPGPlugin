@@ -84,6 +84,13 @@ public class PlayerClassManager {
         SerializeManager.yml.set("Plugin.playerClass", mapList);
     }
 
+    public static void load() {
+        if (SerializeManager.yml.contains("Plugin.playerClass")) { // 플레이어 직업
+            List<Map<?, ?>> mapList = SerializeManager.yml.getMapList("Plugin.playerClass");
+            PlayerClassManager.setPlayerClassMap((Map<String, String>) mapList.get(0));
+        }
+    }
+
     public static Map<String, String> convertStringMap(Map<UUID, PlayerClass> map) {
         Map<String, String> newMap = new HashMap<>();
         for (Map.Entry<UUID, PlayerClass> entry : map.entrySet()) {

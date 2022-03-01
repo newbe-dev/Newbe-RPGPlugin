@@ -1,5 +1,5 @@
 name: RPGPlugin
-version: 1.0
+version: 1.1
 main: com.example.RPGPlugin.RPGPlugin
 api-version: 1.18
 author: NewbieDev
@@ -32,4 +32,9 @@ commands:
     aliases:
       - q
       - 퀘스트
-    permission: op
+  stat:
+    description: 스탯 관련 명령어를 실행합니다.
+    usage: /stat
+    aliases:
+        - 스탯
+        - status

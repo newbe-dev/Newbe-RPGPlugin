@@ -8,6 +8,9 @@ import com.example.RPGPlugin.Quest.QuestListener;
 import com.example.RPGPlugin.Quest.QuestManager;
 import com.example.RPGPlugin.Reinforce.ReinforceCommand;
 import com.example.RPGPlugin.Shop.ShopCommand;
+import com.example.RPGPlugin.Stat.StatCommand;
+import com.example.RPGPlugin.Stat.StatInvManager;
+import com.example.RPGPlugin.Stat.StatListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,10 +22,8 @@ public class RPGPlugin extends JavaPlugin {
     @Override
     public void onEnable() {    //플러그인 활성화시 실행
         SerializeManager.loadFile();
-        if (SerializeManager.yml.contains("Plugin.playerClass")) { // 플레이어 직업
-            List<Map<?, ?>> mapList = SerializeManager.yml.getMapList("Plugin.playerClass");
-            PlayerClassManager.setPlayerClassMap((Map<String, String>) mapList.get(0));
-        }
+        PlayerClassManager.load();
+        QuestManager.load();
 
         Objects.requireNonNull(getCommand("shop")).setExecutor(new ShopCommand());
         Objects.requireNonNull(getCommand("shop")).setTabCompleter(new ShopCommand());
@@ -32,27 +33,31 @@ public class RPGPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("class")).setTabCompleter(new PlayerClassCommand());
         Objects.requireNonNull(getCommand("quest")).setExecutor(new QuestCommand());
         Objects.requireNonNull(getCommand("quest")).setTabCompleter(new QuestCommand());
+        Objects.requireNonNull(getCommand("stat")).setExecutor(new StatCommand());
         getServer().getPluginManager().registerEvents(new ReinforceInvManager(), this);
         getServer().getPluginManager().registerEvents(new ShopInvManager(), this);
         getServer().getPluginManager().registerEvents(new QuestListener(), this);
+        getServer().getPluginManager().registerEvents(new QuestInvManager(), this);
         getServer().getPluginManager().registerEvents(new Rogue(), this);
+        getServer().getPluginManager().registerEvents(new StatListener(), this);
+        getServer().getPluginManager().registerEvents(new StatInvManager(), this);
 
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::Save, 20L * 30, 20L * 30);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::save, 20L * 10, 20L * 10);
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "RPGPlugin 활성화 !!");  //서버의 로그에 출력
     }
 
     @Override
     public void onDisable() {   //플러그인 비활성화시 실행
-        Save();
+        save();
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "RPGPlugin 비활성화 !!");  //서버의 로그에 출력
     }
 
-    public void Save() { // 스텟
+    public void save() { // 스텟
         PlayerClassManager.save();
         QuestManager.save();
 
         SerializeManager.saveFile();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + "Successfully saved !");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "--save");
     }
 }

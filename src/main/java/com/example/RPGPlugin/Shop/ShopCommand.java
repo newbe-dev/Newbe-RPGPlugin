@@ -37,9 +37,11 @@ public class ShopCommand implements CommandExecutor, TabExecutor {
                     if (entityList.size() == 0) {
                         player.sendMessage("반경 내에 주민이 존재하지 않습니다 !");
                     } else {
-                        LivingEntity entity = (LivingEntity) entityList.get(0);
+                        Entity entity = entityList.get(0);
+                        player.sendMessage(entity.getUniqueId());
                         SerializeManager.yml.set(String.format("Plugin.Shop.Villager.%s", entity.getUniqueId()), Integer.parseInt(args[1]));
                         player.sendMessage(String.format("성공적으로 주민에게 상점 번호가 부여되었습니다 ! ( shopId: %d )", Integer.parseInt(args[1])));
+                        SerializeManager.saveFile();
                     }
                     return true;
                 } else if (args[0].equals("shops")) {

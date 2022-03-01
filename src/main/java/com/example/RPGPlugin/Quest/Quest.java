@@ -1,9 +1,6 @@
 package com.example.RPGPlugin.Quest;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -19,49 +16,33 @@ public class Quest {
 
     public QuestType questType;
     public int questId;
-    public int goal = 0;
-    public int progress = 0;
+    public int goal = -1;
+    public int progress = -1;
     public String questName;
+    public String questDescription;
     public Boolean isMainQuest;
 
     public String targetEntity;
-    public String targetMaterial;
+    public String targetItemStack;
     public Location targetLocation;
     public float radius;
 
     public List<ItemStack> rewardItemList;
-    public int rewardQuest;
+    public int rewardQuest = -1;
     public Location rewardLocation;
     public String rewardCommand;
 
-    public ItemStack conditionItem;
-    public int conditionQuest;
+    public List<ItemStack> conditionItemList;
+    public int conditionQuest = -1;
+    public int conditionLevel = -1;
 
-    public void progress(Player player, int num) {
+    public Boolean progress(int num) {
+        if(progress >= goal) return false;
         progress += num;
+        return progress >= goal;
     }
 
-    private Boolean Complete(Player player) {
-        if(progress < goal) {
-            return false;
-        }
-        if(rewardItemList != null) {
-            int empty = 0;
-            for(int i = 0; i < player.getInventory().getSize(); i++) {
-                if(player.getInventory().getItem(i) == null) {
-                    empty += 1;
-                }
-            }
-            if(empty < rewardItemList.size()) {
-                player.sendMessage(String.format("%s%s(!) %s공간이 충분하지 않습니다!", ChatColor.RED, ChatColor.BOLD, ChatColor.DARK_GRAY));
-                player.playSound(player, Sound.BLOCK_ANVIL_PLACE, 5, 1);
-                return false;
-            }
-            for(ItemStack itemStack : rewardItemList) {
-                player.getInventory().addItem(itemStack);
-            }
-        }
-        player.sendMessage(String.format("%s[ %s ]%s 퀘스트를 완료하셨습니다!", ChatColor.BOLD.toString() + (isMainQuest ? ChatColor.GOLD : ChatColor.GRAY), questName, ChatColor.RESET));
-        return true;
+    public Boolean complete() {
+        return progress >= goal;
     }
 }
