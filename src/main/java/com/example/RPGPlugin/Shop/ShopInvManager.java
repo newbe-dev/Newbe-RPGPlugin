@@ -1,8 +1,6 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.Shop;
 
-import com.example.RPGPlugin.Shop.OpenShopInventoryEvent;
-import com.example.RPGPlugin.Shop.ShopInfo;
-import com.example.RPGPlugin.Shop.tradeInfo;
+import com.example.RPGPlugin.SerializeManager;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -59,33 +57,20 @@ public class ShopInvManager implements Listener {
     private Inventory createShopInventory(int shopNo) {
         tradeInfoArrayList = ShopInfo.shopInfoArrayList.get(shopNo);
         Inventory inventory;
-        switch (shopNo) {
-            case 0: {
-                inventory = Bukkit.createInventory(null, 54, String.format("%s%s[ 무기 ]", ChatColor.BOLD, ChatColor.YELLOW));
-                break;
-            }
-            case 1: {
-                inventory = Bukkit.createInventory(null, 54, String.format("%s%s[ 방어구 ]", ChatColor.BOLD, ChatColor.DARK_BLUE));
-                break;
-            }
-            default: {
-                inventory = Bukkit.createInventory(null, 54, "");
-                break;
-            }
-        }
+        inventory = Bukkit.createInventory(null, 54, "상점");
 
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, BLACK_PANEL);
         }
         for (int i = 0; i < tradeInfoArrayList.size(); i++) {
-            inventory.setItem(10 + i*2, tradeInfoArrayList.get(i).buyItemStack);
+            inventory.setItem(10 + i * 2, tradeInfoArrayList.get(i).buyItemStack);
         }
         return inventory;
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {   //인벤토리 클릭 시
-        if (!e.getInventory().contains(BLACK_PANEL) || e.getInventory().getHolder() != null)
+        if (!(e.getInventory().contains(BLACK_PANEL) && e.getView().getTitle().equals("상점")))
             return;    //이 인벤토리를 클릭한게 아니라면 취소
         e.setCancelled(true);   //위치 변경 취소
         ItemStack clickedItem = e.getCurrentItem(); //클릭된 아이템
@@ -112,17 +97,25 @@ public class ShopInvManager implements Listener {
             player.getInventory().addItem(itemStack);
             player.getInventory().removeItem(tradeInfo.priceItemStack);
             player.sendMessage(String.format("%s%s거래에 성공했습니다 !", ChatColor.GREEN, ChatColor.BOLD));
-            player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 50, 1);
+            player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 50, 2);
         } else {
             player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 50, 1);
-            player.sendMessage(String.format("%s%s코인이 부족합니다 !", ChatColor.RED, ChatColor.BOLD));
+            int i = 0;
+            for (int j = 0; j < player.getInventory().getSize(); j++) {
+                if(player.getInventory().getItem(j) != null) {
+                    if(player.getInventory().getItem(j).getType() == Material.CHARCOAL) {
+                        i += player.getInventory().getItem(j).getAmount();
+                    }
+                }
+            }
+            player.sendMessage(String.format("%s%s구매할 수 없습니다 ! (부족한 코인: %d)", ChatColor.RED, ChatColor.BOLD, tradeInfo.priceItemStack.getAmount() - i));
             player.closeInventory();
         }
     }
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent e) { //인벤토리 드래그 시
-        if (!e.getInventory().contains(BLACK_PANEL) || e.getInventory().getHolder() != null) {  //만약 드래그된 인벤토리가 이 인벤토리라면
+        if (e.getInventory().contains(BLACK_PANEL) && e.getView().getTitle().equals("상점")) {  //만약 드래그된 인벤토리가 이 인벤토리라면
             e.setCancelled(true);   //위치 변경 취소
         }
     }
@@ -131,7 +124,7 @@ public class ShopInvManager implements Listener {
     public void onEntityInteract(PlayerInteractEntityEvent e) {
         Entity entity = e.getRightClicked();
         Player player = e.getPlayer();
-        if(entity instanceof Player) return;
+        if (entity instanceof Player) return;
         if (!SerializeManager.yml.contains(String.format("Plugin.Shop.Villager.%s", entity.getUniqueId())))
             return;
         OpenShopInventoryEvent event = new OpenShopInventoryEvent(player, SerializeManager.yml.getInt(String.format("Plugin.Shop.Villager.%s", entity.getUniqueId())));

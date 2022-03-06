@@ -72,7 +72,7 @@ public class QuestManager { // Quest.숫자 -> 퀘스트 정보, Quest.uuid -> �
 
     @Nullable
     public static Quest loadQuest(int questId) {
-        ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Quest.%d", questId));
+        ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Quest.%d", questId));
         if (node == null) return null;
 
         Quest quest = new Quest(); // 반환할 퀘스트 객체
@@ -88,16 +88,16 @@ public class QuestManager { // Quest.숫자 -> 퀘스트 정보, Quest.uuid -> �
             quest.conditionItemList = (List<ItemStack>) node.getList("conditionItemList");
         }
         if (node.contains("conditionQuest")) {
-            quest.conditionQuest = node.getInt("conditionQuest");
+            quest.conditionQuest = node.getInt("conditionQuest", -1);
         }
         if (node.contains("conditionLevel")) {
-            quest.conditionLevel = node.getInt("conditionLevel");
+            quest.conditionLevel = node.getInt("conditionLevel", -1);
         }
         if (node.contains("rewardItemList")) {
             quest.rewardItemList = (List<ItemStack>) node.getList("rewardItemList");
         }
         if (node.contains("rewardQuest")) {
-            quest.rewardQuest = node.getInt("rewardQuest");
+            quest.rewardQuest = node.getInt("rewardQuest", -1);
         }
         if (node.contains("rewardLocation")) {
             quest.rewardLocation = node.getLocation("rewardLocation");
@@ -111,12 +111,6 @@ public class QuestManager { // Quest.숫자 -> 퀘스트 정보, Quest.uuid -> �
                 quest.targetEntity = node.getString("targetEntity");
                 break;
             case COLLECT:
-            case DESTROY:
-                quest.targetItemStack = node.getString("targetItemStack");
-                break;
-            case DELIVERY:
-                quest.targetEntity = node.getString("targetEntity");
-                quest.targetItemStack = node.getString("targetItemStack");
                 break;
             case LOCATION:
                 quest.targetLocation = node.getLocation("targetLocation");

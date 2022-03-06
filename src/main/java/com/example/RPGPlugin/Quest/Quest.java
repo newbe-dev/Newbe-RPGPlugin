@@ -9,8 +9,6 @@ public class Quest {
     public enum QuestType {
         HUNT,
         COLLECT,
-        DELIVERY,
-        DESTROY,
         LOCATION
     }
 
@@ -23,7 +21,6 @@ public class Quest {
     public Boolean isMainQuest;
 
     public String targetEntity;
-    public String targetItemStack;
     public Location targetLocation;
     public float radius;
 
@@ -39,10 +36,6 @@ public class Quest {
     public Boolean progress(int num) {
         if(progress >= goal) return false;
         progress += num;
-        return progress >= goal;
-    }
-
-    public Boolean complete() {
         return progress >= goal;
     }
 }

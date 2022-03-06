@@ -12,7 +12,7 @@ public class PlayerClassCommand implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {  //명령어 실행 시
         if (args.length == 0) {
-            return false;
+            Bukkit.getPluginManager().callEvent(new OpenPlayerClassInventoryEvent((Player) sender));
         } else if (args[0].equals("set")) {
             if (args.length == 2) {
                 if(sender instanceof ConsoleCommandSender) {
@@ -65,9 +65,9 @@ public class PlayerClassCommand implements CommandExecutor, TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if(!sender.isOp()) return null;
-        if(command.getName().equals("cl") || command.getName().equals("class")) {
+        if(command.getName().equals("cl") || command.getName().equals("class") || command.getName().equals("직업")) {
             if(args.length == 1) {
-                return Arrays.asList("set", "remove");
+                return Arrays.asList("set", "remove", "get");
             }else if(args.length == 2) {
                 switch (args[0]) {
                     case "set":

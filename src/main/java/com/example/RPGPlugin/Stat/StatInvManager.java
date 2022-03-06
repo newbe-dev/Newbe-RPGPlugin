@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -45,11 +46,10 @@ public class StatInvManager implements Listener {
     }
 
     public ItemStack changeNameItem(ItemStack itemStack, String newName) {
-        ItemStack newItemStack = itemStack;
-        ItemMeta itemMeta = newItemStack.getItemMeta();
+        ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(newName);
-        newItemStack.setItemMeta(itemMeta);
-        return newItemStack;
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
     }
 
     @EventHandler
@@ -66,7 +66,8 @@ public class StatInvManager implements Listener {
 
     public void reloadPage(Inventory inventory, Player player) {
         ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Stat.%s", player.getUniqueId()));
-        if(node == null) node = SerializeManager.yml.createSection(String.format("Plugin.Stat.%s", player.getUniqueId()));
+        if (node == null)
+            node = SerializeManager.yml.createSection(String.format("Plugin.Stat.%s", player.getUniqueId()));
 
         int point = node.getInt("point");
         int attackPower = node.getInt("attackPower");
@@ -87,25 +88,52 @@ public class StatInvManager implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {   // 인벤토리 클릭 시
-        if (!e.getInventory().contains(GRAY_PANEL) || e.getInventory().getSize() != 27)
+        if (!(e.getInventory().contains(GRAY_PANEL) && e.getView().getTitle().equals("스탯")))
             return;    // 이 인벤토리를 클릭한게 아니라면 취소
         e.setCancelled(true);   // 위치 변경 취소
         ItemStack clickedItem = e.getCurrentItem(); // 클릭된 아이템
         Player player = (Player) e.getWhoClicked(); // 플레이어
-        switch (clickedItem.getType()) {
-            case IRON_SWORD:
-                StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.attackPower, 1);
-                break;
-            case ENCHANTED_BOOK:
-                StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.skillPower, 1);
-                break;
-            case IRON_CHESTPLATE:
-                StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.defense, 1);
-                break;
-            case GOLDEN_APPLE:
-                StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.health, 1);
-                break;
+        if (clickedItem == null) return;
+
+        if (e.isLeftClick()) {
+            switch (clickedItem.getType()) {
+                case IRON_SWORD:
+                    StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.attackPower, 1);
+                    break;
+                case ENCHANTED_BOOK:
+                    StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.skillPower, 1);
+                    break;
+                case IRON_CHESTPLATE:
+                    StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.defense, 1);
+                    break;
+                case GOLDEN_APPLE:
+                    StatManager.useStatPoint(player.getUniqueId(), StatManager.STAT.health, 1);
+                    break;
+            }
+        } else if (e.isRightClick()) {
+            switch (clickedItem.getType()) {
+                case IRON_SWORD:
+                    StatManager.removeStatPoint(player.getUniqueId(), StatManager.STAT.attackPower, 1);
+                    break;
+                case ENCHANTED_BOOK:
+                    StatManager.removeStatPoint(player.getUniqueId(), StatManager.STAT.skillPower, 1);
+                    break;
+                case IRON_CHESTPLATE:
+                    StatManager.removeStatPoint(player.getUniqueId(), StatManager.STAT.defense, 1);
+                    break;
+                case GOLDEN_APPLE:
+                    StatManager.removeStatPoint(player.getUniqueId(), StatManager.STAT.health, 1);
+                    break;
+            }
         }
+
         reloadPage(e.getInventory(), player);
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent e) { //인벤토리 드래그 시
+        if (e.getInventory().contains(GRAY_PANEL) && e.getView().getTitle().equals("스탯")) {  //만약 드래그된 인벤토리가 이 인벤토리라면
+            e.setCancelled(true);   //위치 변경 취소
+        }
     }
 }

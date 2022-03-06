@@ -1,8 +1,6 @@
-package com.example.RPGPlugin;
+package com.example.RPGPlugin.Quest;
 
-import com.example.RPGPlugin.Quest.OpenQuestInventoryEvent;
-import com.example.RPGPlugin.Quest.Quest;
-import com.example.RPGPlugin.Quest.QuestManager;
+import com.example.RPGPlugin.SerializeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -13,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -33,7 +32,7 @@ public class QuestInvManager implements Listener {
 
         PAPER = createItem(Material.PAPER, String.format("%s%s비어 있음", ChatColor.ITALIC, ChatColor.STRIKETHROUGH), Arrays.asList(String.format("%sNPC들에게 말을 걸어 퀘스트를 받을 수 있습니다 !", ChatColor.GRAY)));
 
-        BLACK_PANEL = createItem(Material.BLACK_STAINED_GLASS_PANE, " ", null);
+        BLACK_PANEL = createItem(Material.BLACK_STAINED_GLASS_PANE, "", null);
     }
 
     private ItemStack createItem(Material material, String displayName, List<String> lore) {
@@ -115,7 +114,7 @@ public class QuestInvManager implements Listener {
     }
 
     private Inventory createQuestInventory(Player player, Entity entity) {
-        Inventory inventory = Bukkit.createInventory((InventoryHolder) entity, 54, entity.getName());
+        Inventory inventory = Bukkit.createInventory((InventoryHolder) entity, 54, "퀘스트");
 
         // -- 초기화 --
         for (int i = 0; i < inventory.getSize(); i++) {
@@ -196,8 +195,24 @@ public class QuestInvManager implements Listener {
     }
 
     public void completeQuest(Player player, Quest q) {
-        if (QuestManager.getPlayerProgress(player.getUniqueId(), q.questId) >= q.goal) {
-            player.sendMessage("complete");
+        boolean complete;
+        if(q.questType.equals(Quest.QuestType.COLLECT)) {
+            for(ItemStack i : q.conditionItemList) {
+                if(!(player.getInventory().containsAtLeast(i, i.getAmount()))) {
+                    return;
+                }
+            }
+            for(ItemStack i : q.conditionItemList) {
+                player.getInventory().removeItem(i);
+            }
+            complete = true;
+        }else {
+            complete = (QuestManager.getPlayerProgress(player.getUniqueId(), q.questId) >= q.goal);
+        }
+        if(q.conditionQuest != -1) {
+            complete = SerializeManager.yml.getBoolean(String.format("Plugin.finishedQuest.%s.%d", player.getUniqueId(), q.questId));
+        }
+        if (complete && player.getLevel() >= q.conditionLevel) {
             if (q.rewardItemList != null) {
                 int empty = 0;
                 for (int i = 0; i < player.getInventory().getSize(); i++) {
@@ -207,7 +222,7 @@ public class QuestInvManager implements Listener {
                 }
                 if (empty < q.rewardItemList.size()) {
                     player.sendMessage(String.format("%s%s공간이 충분하지 않습니다 !", ChatColor.BOLD, ChatColor.DARK_RED));
-                    player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 5, 1);
+                    player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 50, 2);
                     return;
                 }
                 for (ItemStack itemStack : q.rewardItemList) {
@@ -226,7 +241,7 @@ public class QuestInvManager implements Listener {
 
             // Complete
             player.sendMessage(String.format("%s[ %s ]%s 퀘스트를 완료하셨습니다!", ChatColor.BOLD.toString() + (q.isMainQuest ? ChatColor.GOLD : ChatColor.GRAY), q.questName, ChatColor.RESET));
-            player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 50, 1);
+            player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 50, 5);
             QuestManager.removePlayerQuest(player.getUniqueId(), q.questId);
             SerializeManager.yml.set(String.format("Plugin.finishedQuest.%s.%d", player.getUniqueId(), q.questId), true);
         }
@@ -234,7 +249,7 @@ public class QuestInvManager implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {   //인벤토리 클릭 시
-        if (!e.getInventory().contains(BLACK_PANEL) || e.getInventory().getSize() != 54)
+        if (!(e.getInventory().contains(BLACK_PANEL) && e.getView().getTitle().equals("퀘스트")))
             return;    //이 인벤토리를 클릭한게 아니라면 취소
         e.setCancelled(true);
         Player player = (Player) e.getWhoClicked();
@@ -243,7 +258,7 @@ public class QuestInvManager implements Listener {
             return;
         ItemStack clickedItem = e.getCurrentItem(); //클릭된 아이템
         if (player != e.getInventory().getHolder()) { // 퀘스트
-            if (clickedItem == null || clickedItem.getType().equals(Material.AIR) || clickedItem.getType().equals(Material.LIME_STAINED_GLASS_PANE))
+            if (clickedItem == null)
                 return;
 
             if (clickedItem.getType().equals(Material.ENCHANTED_BOOK) && e.isLeftClick()) {
@@ -322,6 +337,13 @@ public class QuestInvManager implements Listener {
             inventory.setItem(40, dye);
 
             q.progress = progress;
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent e) { //인벤토리 드래그 시
+        if (e.getInventory().contains(BLACK_PANEL) && e.getView().getTitle().equals("퀘스트")) {  //만약 드래그된 인벤토리가 이 인벤토리라면
+            e.setCancelled(true);   //위치 변경 취소
         }
     }
 }
