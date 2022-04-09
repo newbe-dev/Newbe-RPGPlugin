@@ -25,6 +25,7 @@ public class RPGPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {    //플러그인 활성화시 실행
+        MyScoreBoardManager manager = new MyScoreBoardManager();
         SerializeManager.loadFile();
         QuestManager.load();
 
@@ -41,6 +42,7 @@ public class RPGPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("quest")).setTabCompleter(new QuestCommand());
 
         Objects.requireNonNull(getCommand("stat")).setExecutor(new StatCommand());
+        Objects.requireNonNull(getCommand("node")).setExecutor(new NodeCommand());
 
         getServer().getPluginManager().registerEvents(new ReinforceInvManager(), this);
         getServer().getPluginManager().registerEvents(new ShopInvManager(), this);
@@ -71,6 +73,6 @@ public class RPGPlugin extends JavaPlugin {
         QuestManager.save();
 
         SerializeManager.saveFile();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "--save");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + "--save");
     }
 }

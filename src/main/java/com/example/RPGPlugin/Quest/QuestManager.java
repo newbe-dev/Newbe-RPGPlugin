@@ -130,7 +130,7 @@ public class QuestManager { // Quest.숫자 -> 퀘스트 정보, Quest.uuid -> �
 
     public static void load() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Set<Quest> questSet = LoadPlayerQuest(player.getUniqueId());
+            Set<Quest> questSet = loadPlayerQuest(player.getUniqueId());
             if (questSet == null) return;
 
             QuestManager.getPlayerQuestMap().put(player.getUniqueId(), questSet);
@@ -138,7 +138,7 @@ public class QuestManager { // Quest.숫자 -> 퀘스트 정보, Quest.uuid -> �
         }
     }
 
-    public static Set<Quest> LoadPlayerQuest(UUID uuid) {
+    public static Set<Quest> loadPlayerQuest(UUID uuid) {
         ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Quest.%s", uuid));
         if (node == null)
             return null;

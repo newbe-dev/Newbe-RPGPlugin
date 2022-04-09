@@ -3,17 +3,13 @@ package com.example.RPGPlugin.Quest;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -22,7 +18,7 @@ public class QuestListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        Set<Quest> questSet = QuestManager.LoadPlayerQuest(e.getPlayer().getUniqueId());
+        Set<Quest> questSet = QuestManager.loadPlayerQuest(e.getPlayer().getUniqueId());
         if (questSet == null) return;
 
         QuestManager.getPlayerQuestMap().put(e.getPlayer().getUniqueId(), questSet);

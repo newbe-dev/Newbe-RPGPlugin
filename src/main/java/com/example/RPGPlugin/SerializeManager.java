@@ -11,8 +11,15 @@ import java.io.IOException;
 
 public class SerializeManager {
     public static YamlConfiguration yml = new YamlConfiguration();
-    public static final Plugin plugin = Bukkit.getPluginManager().getPlugin("RPGPlugin");
+    private static Plugin plugin;
     public static File configFile;
+
+    public static Plugin getPlugin() {
+        if(plugin == null) {
+            plugin = Bukkit.getPluginManager().getPlugin("RPGPlugin");
+        }
+        return plugin;
+    }
 
     public static void saveFile() {
         try {
@@ -23,7 +30,9 @@ public class SerializeManager {
     }
 
     public static void loadFile() {
-        assert plugin != null;
+        if(plugin == null) {
+            plugin = Bukkit.getPluginManager().getPlugin("RPGPlugin");
+        }
         if (!plugin.getDataFolder().exists()) { // 폴더가 존재하지 않는다면
             try {
                 if(plugin.getDataFolder().mkdirs()) {

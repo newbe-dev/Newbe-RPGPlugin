@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="NewbiedevPlugin">
-    <output-path>$USER_HOME$/Desktop/spigot/plugins</output-path>
-    <root id="archive" name="NewbiedevPlugin.jar">
+  <artifact type="jar" name="RPGPlugin">
+    <output-path>$PROJECT_DIR$/../../spigot/plugins</output-path>
+    <root id="archive" name="RPGPlugin.jar">
       <element id="module-output" name="TestPlugin.main" />
       <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
     </root>

@@ -63,10 +63,10 @@ public class QuestInvManager implements Listener {
         if (!SerializeManager.yml.contains(String.format("Plugin.Quest.%s", entity.getUniqueId())))
             return;
 
-        Bukkit.getScheduler().runTaskLater(SerializeManager.plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(SerializeManager.getPlugin(), () -> {
             OpenQuestInventoryEvent event = new OpenQuestInventoryEvent(player, entity);
             Bukkit.getPluginManager().callEvent(event);
-        }, 5L);
+        }, 1L);
     }
 
     private List<Quest>[] getQuests(Player player, Entity entity) {

@@ -1,9 +1,8 @@
 package com.example.RPGPlugin.Stat;
 
-import com.example.RPGPlugin.SerializeManager;
+import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,15 +17,10 @@ public class StatListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Stat.%s", player.getUniqueId()));
-
-        if (node == null) {
-            node = SerializeManager.yml.createSection(String.format("Plugin.Stat.%s", player.getUniqueId()));
-        }
-
         AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        double health = 20 + node.getInt("health") * 1.333;
+        double health = 20 + StatManager.getFinalStat(player, StatManager.STAT.health) * 1.333;
         attribute.setBaseValue(health);
+        player.setHealth(health);
     }
 
     @EventHandler
@@ -36,27 +30,28 @@ public class StatListener implements Listener {
 
     @EventHandler
     public void onDamageByEntity(EntityDamageByEntityEvent e) {
-        double damage = e.getFinalDamage();
-        if(e.getDamager() instanceof Player) {
-            int attackPower = SerializeManager.yml.getInt(String.format("Plugin.Stat.%s.attackPower", e.getDamager().getUniqueId()));
-            damage *= (1 + attackPower * 0.04);
+        if (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && e.getDamager() instanceof Player) {
+            double damage = e.getFinalDamage();
+            int attackPower = StatManager.getFinalStat((Player) e.getDamager(), StatManager.STAT.attackPower);
+            damage *= 1 + attackPower * 0.03;
+            e.getDamager().sendMessage(String.format("%s%s( -%.1f )", ChatColor.RED, ChatColor.BOLD, (float) damage));
+            e.setDamage(damage);
         }
-        e.setDamage(damage);
     }
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
-        double damage = e.getFinalDamage();
-        if(e.getEntity() instanceof Player) {
-            int defense = SerializeManager.yml.getInt(String.format("Plugin.Stat.%s.defense", e.getEntity().getUniqueId()));
-            damage /= (1 + defense * 0.04);
+        if (e.getEntity() instanceof Player) {
+            double damage = e.getFinalDamage();
+            int defense = StatManager.getFinalStat((Player) e.getEntity(), StatManager.STAT.defense);
+            damage /= (1 + defense * 0.03);
+            e.setDamage(damage);
         }
-        e.setDamage(damage);
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent e) {
-        if(e.getEntity().getKiller() != null) {
+        if (e.getEntity().getKiller() != null) {
             StatManager.addExp(e.getEntity().getKiller().getUniqueId(), 500);
         }
     }

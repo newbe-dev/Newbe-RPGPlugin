@@ -9,6 +9,7 @@ import java.util.List;
 
 public class QuestCommand implements CommandExecutor, TabExecutor {
 
+    @SuppressWarnings("all")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {  //명령어 실행 시
         if (sender instanceof Player) {  //명령어 사용자가 플레이어인 경우
@@ -89,6 +90,7 @@ public class QuestCommand implements CommandExecutor, TabExecutor {
         return false;   //false값을 반환하면 명령어가 실패한 것으로 간주
     }
 
+    @SuppressWarnings("all")
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!sender.isOp()) return null;

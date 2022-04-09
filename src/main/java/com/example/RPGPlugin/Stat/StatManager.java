@@ -1,14 +1,19 @@
 package com.example.RPGPlugin.Stat;
 
+import com.example.RPGPlugin.PlayerClass.PlayerClass;
+import com.example.RPGPlugin.PlayerClass.PlayerClassManager;
 import com.example.RPGPlugin.SerializeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class StatManager {
@@ -26,6 +31,7 @@ public class StatManager {
         defense,
         health
     }
+    public static Map<UUID, Integer> tempDef = new HashMap();
 
     public static void addExp(UUID uuid, double experience) {
         ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Stat.%s", uuid));
@@ -60,12 +66,8 @@ public class StatManager {
     }
 
     public static void useStatPoint(UUID uuid, STAT statType, int amount) {
-        ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Stat.%s", uuid));
+        ConfigurationSection node = getNode(uuid);
         Player player = Bukkit.getPlayer(uuid);
-
-        if (node == null) {
-            node = SerializeManager.yml.createSection(String.format("Plugin.Stat.%s", uuid));
-        }
 
         int point = node.getInt("point");
         point -= amount;
@@ -102,17 +104,12 @@ public class StatManager {
     }
 
     public static void removeStatPoint(UUID uuid, STAT statType, int amount) {
-        ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Stat.%s", uuid));
+        ConfigurationSection node = getNode(uuid);
         Player player = Bukkit.getPlayer(uuid);
-        if (node == null) {
-            node = SerializeManager.yml.createSection(String.format("Plugin.Stat.%s", uuid));
-        }
 
         int currentStat = node.getInt(statType.name());
         currentStat -= amount;
-        if (currentStat < 0) {
-            return;
-        }
+        if (currentStat < 0) return;
         node.set(statType.name(), currentStat);
 
         int point = node.getInt("point");
@@ -123,7 +120,79 @@ public class StatManager {
             AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
             double health = 20 + currentStat * 1.333;
             attribute.setBaseValue(health);
+            player.setHealth(health);
         }
-        player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 50, 2);
+        player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 50, 1);
+    }
+
+    public static ConfigurationSection getNode(UUID uuid) {
+        ConfigurationSection node = SerializeManager.yml.getConfigurationSection(String.format("Plugin.Stat.%s", uuid));
+        if (node == null) {
+            node = SerializeManager.yml.createSection(String.format("Plugin.Stat.%s", uuid));
+        }
+        return node;
+    }
+
+    public static int getFinalStat(Player player, STAT statType) {
+        ConfigurationSection node = getNode(player.getUniqueId());
+        int currentStat = node.getInt(statType.name());
+        if(statType.equals(STAT.defense)) {
+            currentStat += tempDef.getOrDefault(player.getUniqueId(), 0);
+        }
+
+        if(PlayerClassManager.getPlayerClass(player).equals(PlayerClass.KNIGHT)) {
+            switch (statType) {
+                case attackPower:
+                    int defense = node.getInt("defense");
+                    currentStat += defense / 3;
+                    break;
+                case defense:
+                    int attack = node.getInt("attack");
+                    currentStat += attack / 3;
+                    break;
+            }
+        }
+
+        if(statType.equals(STAT.defense)) {
+            if(player.getInventory().getHelmet() != null) {
+                switch (player.getInventory().getHelmet().getItemMeta().getDisplayName()) {
+                    case "낡은 투구":
+                        currentStat += 1;
+                        break;
+                }
+            }
+            if(player.getInventory().getChestplate() != null) {
+                switch (player.getInventory().getChestplate().getItemMeta().getDisplayName()) {
+                    case "낡은 갑옷":
+                        currentStat += 1;
+                        break;
+                }
+            }
+            if(player.getInventory().getLeggings() != null) {
+                switch (player.getInventory().getLeggings().getItemMeta().getDisplayName()) {
+                    case "낡은 레깅스":
+                        currentStat += 1;
+                        break;
+                }
+            }
+            if(player.getInventory().getBoots() != null) {
+                switch (player.getInventory().getBoots().getItemMeta().getDisplayName()) {
+                    case "낡은 부츠":
+                        currentStat += 1;
+                        break;
+                }
+            }
+        }
+        else if(statType.equals(STAT.attackPower)) {
+            if(!player.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+                switch (player.getInventory().getItemInMainHand().getItemMeta().getDisplayName()) {
+                    case "모험가의 검":
+                        currentStat += 1;
+                        break;
+                }
+            }
+        }
+
+        return currentStat;
     }
 }

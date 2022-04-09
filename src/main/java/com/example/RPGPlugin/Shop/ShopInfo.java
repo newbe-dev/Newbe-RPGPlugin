@@ -72,8 +72,8 @@ public class ShopInfo {
     public static void conductSerializing() {
         for (int i = 0; i < shopInfoArrayList.size(); i++) {
             for (int j = 0; j < shopInfoArrayList.get(i).size(); j++) {
-                SerializeManager.yml.set(String.format("Plugin.shop%d.trade%d.buy", i, j), shopInfoArrayList.get(i).get(j).buyItemStack);
-                SerializeManager.yml.set(String.format("Plugin.shop%d.trade%d.price", i, j), shopInfoArrayList.get(i).get(j).priceItemStack);
+                SerializeManager.yml.set(String.format("Shop.s%d.t%d.buy", i, j), shopInfoArrayList.get(i).get(j).buyItemStack);
+                SerializeManager.yml.set(String.format("Shop.s%d.t%d.price", i, j), shopInfoArrayList.get(i).get(j).priceItemStack);
             }
         }
         SerializeManager.saveFile();
@@ -82,10 +82,10 @@ public class ShopInfo {
 
     public static void conductDeserializing() {
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "상점 목록을 불러오는 중입니다 ..");
-        for (int i = 0; SerializeManager.yml.contains(String.format("Plugin.shop%d", i)); i++) {
+        for (int i = 0; SerializeManager.yml.contains(String.format("Shop.s%d", i)); i++) {
             ArrayList<tradeInfo> temp = new ArrayList<>();
-            for (int j = 0; SerializeManager.yml.contains(String.format("Plugin.shop%d.trade%d", i, j)); j++) {
-                tradeInfo t = new tradeInfo(SerializeManager.yml.getItemStack(String.format("Plugin.shop%d.trade%d.buy", i, j)), SerializeManager.yml.getItemStack(String.format("Plugin.shop%d.trade%d.price", i, j)));
+            for (int j = 0; SerializeManager.yml.contains(String.format("Shop.s%d.t%d", i, j)); j++) {
+                tradeInfo t = new tradeInfo(SerializeManager.yml.getItemStack(String.format("Shop.s%d.t%d.buy", i, j)), SerializeManager.yml.getItemStack(String.format("Shop.s%d.t%d.price", i, j)));
                 temp.add(t);
             }
             shopInfoArrayList.add(temp);

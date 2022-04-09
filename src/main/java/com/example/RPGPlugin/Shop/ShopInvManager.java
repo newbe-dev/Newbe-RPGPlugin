@@ -24,7 +24,7 @@ public class ShopInvManager implements Listener {
 
     public ShopInvManager() {
         Bukkit.createInventory(null, 54, "상점");
-        BLACK_PANEL = createItem(Material.BLACK_STAINED_GLASS_PANE, String.format("%s%s#", ChatColor.BLACK, ChatColor.ITALIC), null);
+        BLACK_PANEL = createItem(Material.BLACK_STAINED_GLASS_PANE, " ", null);
     }
 
     private ItemStack createItem(Material material, String displayName, List<String> lore) {
@@ -39,7 +39,7 @@ public class ShopInvManager implements Listener {
 
     @EventHandler
     public void onOpenShopInventory(OpenShopInventoryEvent e) {
-        if (!SerializeManager.yml.contains("Plugin.shop0")) {
+        if (!SerializeManager.yml.contains("Shop.s0")) {
             ShopInfo.InitShopInfo();
             ShopInfo.conductSerializing();
         } else {

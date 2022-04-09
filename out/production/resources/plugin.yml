@@ -1,5 +1,5 @@
 name: RPGPlugin
-version: 1.1
+version: 1.11
 main: com.example.RPGPlugin.RPGPlugin
 api-version: 1.18
 author: NewbieDev
@@ -25,7 +25,6 @@ commands:
     aliases:
       - cl
       - 직업
-    permission: op
   quest:
     description: 퀘스트 관련 명령어를 실행합니다.
     usage: /quest
@@ -38,3 +37,6 @@ commands:
     aliases:
         - 스탯
         - status
+  node:
+    description: 테스트 용도.
+    usage: /node
